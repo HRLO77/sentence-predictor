@@ -45,11 +45,15 @@ model = keras.Sequential([
     tf.keras.layers.Dense(len(classes), activation='softmax'),
 ])
 model.compile(optimizer='nadam', loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), jit_compile=True)
-model.fit(data, labels, epochs=16)
+model.fit(data, labels, epochs=20)
 model.save('./weights.h5')
 
 def predict(string: str):
     prediction = model.predict(encode_str(string.lower())).flatten()
     return tuple(classes[i] for i in reversed(np.argsort(prediction))), prediction
 
-print(predict('Popeyes is the best restaurant because, its tasty, fast, and clean.'))
+print(predict('Popeyes is the best restaurant because, its tasty, fast, and clean.')[0][0])
+print(predict('john, a boy, loves fruits!')[0][0])
+print(predict('when i get home, i clean my room.')[0][0])
+print(predict('the goverment is good for 3 reasons.')[0][0])
+print(predict('KFC is the worst store!')[0][0])
