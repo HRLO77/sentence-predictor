@@ -8,7 +8,8 @@ import keras
 from keras.utils import pad_sequences
 
 def strip_punctuation(s: str):
-    return s.translate(s.maketrans({i:'' for i in string.punctuation})).lower()
+    return s.lower()
+    # return s.translate(s.maketrans({i:'' for i in string.punctuation})).lower()
 
 os.system('cls||clear')
 
@@ -21,7 +22,7 @@ data = data.to_numpy().flatten()
 
 PAD = 0
 
-word2idx = {i+1:strip_punctuation(v) for i,v in enumerate(sorted(set('\n'.join(data))))}
+word2idx = {i+1:v.lower() for i,v in enumerate(sorted(set('\n'.join(data))))}
 char2idx = {v:i for i,v in word2idx.items()}
 
 VOCAB_SIZE = len(char2idx)
@@ -48,7 +49,7 @@ model.fit(data, labels, epochs=16)
 model.save('./weights.h5')
 
 def predict(string: str):
-    prediction = model.predict(encode_str(strip_punctuation(string))).flatten()
+    prediction = model.predict(encode_str(string.lower())).flatten()
     return tuple(classes[i] for i in reversed(np.argsort(prediction))), prediction
 
 print(predict('Popeyes is the best restaurant because, its tasty, fast, and clean.'))
