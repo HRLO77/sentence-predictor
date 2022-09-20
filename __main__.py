@@ -21,7 +21,7 @@ data = data.to_numpy().flatten()
 
 PAD = 0
 
-word2idx = {i+1:strip_punctuation(v) for i,v in enumerate(sorted(set(' '.join(data).split())))}
+word2idx = {i+1:strip_punctuation(v) for i,v in enumerate(sorted(set('\n'.join(data))))}
 char2idx = {v:i for i,v in word2idx.items()}
 
 VOCAB_SIZE = len(char2idx)
@@ -38,18 +38,17 @@ data = encode(data)
 
 model = keras.Sequential([
     tf.keras.layers.Flatten(input_shape=(250,)),
-    tf.keras.layers.Embedding(VOCAB_SIZE, 256),
-    tf.keras.layers.LSTM(128),
-    tf.keras.layers.Dropout(0.4),
-    tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.Dense(256, activation='relu'),
+    tf.keras.layers.Dense(256, activation='relu'),
+    tf.keras.layers.Dense(256, activation='relu'),
     tf.keras.layers.Dense(len(classes), activation='softmax'),
 ])
-model.compile(optimizer='adamax', loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), jit_compile=True)
-model.fit(data, labels, epochs=10)
+model.compile(optimizer='nadam', loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), jit_compile=True)
+model.fit(data, labels, epochs=16)
 model.save('./weights.h5')
 
 def predict(string: str):
     prediction = model.predict(encode_str(strip_punctuation(string))).flatten()
-    return classes[sorted(enumerate(prediction), key=lambda x: x[1], reverse=True)[0][0]], prediction
+    return tuple(classes[i] for i in reversed(np.argsort(prediction))), prediction
 
-print(predict('john doe, a cookie baker, loves cookies'))
+print(predict('Popeyes is the best restaurant because, its tasty, fast, and clean.'))
