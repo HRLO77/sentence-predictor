@@ -42,11 +42,12 @@ model = keras.Sequential([
     tf.keras.layers.Dense(256, activation='relu'),
     tf.keras.layers.Dense(256, activation='relu'),
     tf.keras.layers.Dense(256, activation='relu'),
+    tf.keras.layers.Dropout(0.3),
     tf.keras.layers.Dense(len(classes), activation='softmax'),
 ])
 model.compile(optimizer='nadam', loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), jit_compile=True)
-model.fit(data, labels, epochs=20)
-# model.save('./weights.h5')
+model.fit(data, labels, epochs=17)
+model.save('./weights.h5')
 
 def predict(string: str):
     prediction = model.predict(encode_str(string.lower())).flatten()
@@ -57,3 +58,4 @@ print(predict('john, a boy, loves fruits!'))
 print(predict('when I get home, I clean my room.'))
 print(predict('the goverment is good for 3 reasons.'))
 print(predict('KFC is the worst store!'))
+print(predict('dates are a healthy snack and fruit.'))
